@@ -1,0 +1,134 @@
+textarea {
+  border: 1px solid lightgray;
+  display: block; /* for zero padding of chrome */
+  resize: both !important;
+  min-height: 50px;
+  min-width: 50px;
+  width: 120px;
+  font-size: 11px;
+  font-family: verdana, sans-serif;
+}
+
+#whiteboard,
+#shape-layer {
+  position: absolute;
+  top: 40px;
+  left: 0px;
+  margin: 30px;
+}
+#shape-layer {
+  pointer-events: none;
+}
+#whiteboard {
+  background-color: white;
+}
+#select-leader{
+  padding: 3px 10px;
+}
+#clear-button {
+  margin-left: 800px;
+  cursor: pointer;
+  border: none;
+  padding: 3px 10px;
+  background-color: lightgrey;
+}
+.tools {
+  position: fixed;
+  top: 90px;
+  left: 50px;
+  z-index: 2000;
+}
+
+.colors {
+  margin-bottom: 20px;
+}
+
+.tool {
+  text-align: center;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.tool > i {
+  vertical-align: sub;
+}
+.tool:hover {
+  background-color: #e0f1f8;
+}
+
+.color.black {
+  color: black;
+}
+.color.red {
+  color: red;
+}
+.color.green {
+  color: green;
+}
+/* Tooltip container */
+.tooltip {
+  position: relative;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  font-size: 12px;
+  visibility: hidden;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  margin-left: 10px;
+  margin-top: 5px;
+  width: 70px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.dropbtn {
+  background-color: #161a16;
+  color: white;
+  padding: 16px;
+  padding-left: 20px;
+
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+    padding-left: 30px;
+
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1;}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn {background-color: #333633;}

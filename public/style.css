@@ -1,0 +1,34 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans", Meiryo, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+html {
+  background-image: url("background.jpg");
+}
+
+#menu {
+  padding: 10px 40px;
+  display: flex;
+  align-items: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+#logo {
+  width: 24px;
+  margin-right: 8px;
+}
+#title {
+  font-weight: bold;
+  font-size: 19px;
+}
+#title a {
+  color: white;
+  text-decoration: none;
+}

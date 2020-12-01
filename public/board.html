@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Whiteboard</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/board.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" />
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css" />
+</head>
+
+<body style="min-width: 1660px; min-height: 1300px">
+  <div id="menu">
+    <div><img id="logo" src="/logo.png" alt="" /></div>
+    <div id="title"><a href="/">Whiteboard</a></div>
+    <div class="dropdown" style="float:left;">
+      <button class="dropbtn">Select Leader</button>
+      <div class="dropdown-content" style="left:10;">
+        <a href="#">user 1</a>
+        <a href="#">user 2</a>
+        <a href="#">user 3</a>
+      </div>
+    </div>
+
+    <div>
+      <button id="clear-button">Clear Whiteboard</button>
+    </div>
+  </div>
+  <div>
+    <canvas id="whiteboard" width="1600" height="1200"></canvas>
+    <canvas id="shape-layer" width="1600" height="1200"></canvas>
+  </div>
+
+  <div class="tools">
+    <div class="colors">
+      <div class="tool color black" data-color="black">
+        <i class="fas fa-pen" data-color="black"></i>
+      </div>
+      <div class="tool color red" data-color="red">
+        <i class="fas fa-pen" data-color="red"></i>
+      </div>
+      <div class="tool color green" data-color="green">
+        <i class="fas fa-pen" data-color="green"></i>
+      </div>
+      <div class="tool shape line tooltip">
+        <i class="fas fa-ruler-horizontal"></i>
+        <span class="tooltiptext">Line</span>
+      </div>
+      <div class="tool shape box tooltip">
+        <i class="far fa-square"></i>
+        <span class="tooltiptext">Square</span>
+      </div>
+      <div class="tool shape circle tooltip">
+        <i class="far fa-circle"></i>
+        <span class="tooltiptext">Circle</span>
+      </div>
+      <div class="tool color white tooltip" data-color="white">
+        <i class="fas fa-eraser" data-color="white"></i>
+        <span class="tooltiptext">Eraser</span>
+      </div>
+    </div>
+    <div class="tool undo tooltip">
+      <i class="fas fa-undo-alt"></i>
+      <span class="tooltiptext">Undo</span>
+    </div>
+    <div class="tool redo tooltip">
+      <i class="fas fa-redo-alt"></i>
+      <span class="tooltiptext">Redo</span>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+  <script src="https://cdn.rawgit.com/jwarby/jquery-awesome-cursor/master/dist/jquery.awesome-cursor.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/board.js"></script>
+</body>
+
+</html>
