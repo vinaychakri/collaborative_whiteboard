@@ -11,7 +11,7 @@ app.get("/board/*", (req, res, next) => {
 
 const Redis = require("ioredis");
 const REDIS_PREFIX = process.env.REDIS_PREFIX || "whiteboard-";
-const REDIS_TTL_SEC = process.env.REDIS_TTL_SEC || 30 * 24 * 60 * 60; // default: 30 days
+const REDIS_TTL_SEC = process.env.REDIS_TTL_SEC || 30 * 24 * 60 * 60;
 const { REDIS_URL } = process.env;
 let redis;
 if (REDIS_URL) {
@@ -20,9 +20,7 @@ if (REDIS_URL) {
   );
   redis = new Redis(REDIS_URL);
 }
-
 const boards = {};
-
 const saveLimitter = {};
 async function saveBoard(boardId) {
   if (!redis || saveLimitter[boardId]) return;
