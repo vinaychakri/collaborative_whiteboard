@@ -1,10 +1,10 @@
 "use strict";
 const PEN_WIDTH = 4;
 const ERASER_WIDTH = 50;
-const usernameFormat = (username) => {
-  return username.length > 0 ? `(${username})` : "";
+const signatureFormat = (signature) => {
+  return signature.length > 0 ? `(${signature})` : "";
 };
-styles.options = {
+toastr.options = {
   closeButton: false,
   debug: false,
   newestOnTop: false,
@@ -21,11 +21,16 @@ styles.options = {
   showMethod: "fadeIn",
   hideMethod: "fadeOut",
 };
+
+// define
 const MODE = {
   pen: "pen",
   line: "line",
   box: "box",
   circle: "circle",
+  sticky_note: "sticky-note",
+  hand: "hand",
+  rock: "rock",
 };
 
 const ACTION = {
@@ -33,8 +38,8 @@ const ACTION = {
 };
 
 (function () {
-  const MENU_HEIGHT = 50;
-  const PADDING = 40;
+  const MENU_HEIGHT = 40;
+  const PADDING = 30;
   const current = {
     id: "",
     x: 0,
@@ -43,36 +48,50 @@ const ACTION = {
     width: PEN_WIDTH,
     mode: MODE.pen,
   };
+  WebFont.load({
+    custom: {
+      families: ["Font Awesome 5 Free"],
+    },
+    active: function () {
+      setCursor();
+    },
+  });
   let drawing = false;
-  const History = [];
+  let editing = false;
+
+  const actionHistory = [];
   let actionPointer = -1;
   function putAction(data) {
-    if (History.length - 1 > actionPointer) {
-      History.splice(actionPointer + 1);
+    if (actionHistory.length - 1 > actionPointer) {
+      actionHistory.splice(actionPointer + 1);
     }
-    History.push(data);
+    actionHistory.push(data);
     actionPointer += 1;
   }
-  function resetHistory() {
-    History.splice(0);
+  function resetActionHistory() {
+    actionHistory.splice(0);
     actionPointer = -1;
   }
+
   const canvas = document.getElementById("whiteboard");
   const context = canvas.getContext("2d");
   context.lineJoin = "round";
   context.lineCap = "round";
+
   const shapeLayer = document.getElementById("shape-layer");
   const shapeContext = shapeLayer.getContext("2d");
   shapeContext.lineJoin = "round";
   shapeContext.lineCap = "round";
+
   canvas.addEventListener("mousedown", onMouseDown, false);
   canvas.addEventListener("mouseup", onMouseUp, false);
   canvas.addEventListener("mouseout", onMouseUp, false);
-  canvas.addEventListener("mousemove", curserControl(onMouseMove, 10), false);
+  canvas.addEventListener("mousemove", throttle(onMouseMove, 10), false);
   canvas.addEventListener("touchstart", onMouseDown, false);
   canvas.addEventListener("touchend", onMouseUp, false);
   canvas.addEventListener("touchcancel", onMouseUp, false);
-  canvas.addEventListener("touchmove", curserControl(onMouseMove, 10), false);
+  canvas.addEventListener("touchmove", throttle(onMouseMove, 10), false);
+
   $(".color").click(onPenSelect);
   $(".line").click((e) => onSelect(e, MODE.line));
   $(".box").click((e) => onSelect(e, MODE.box));
@@ -82,12 +101,13 @@ const ACTION = {
   $("#clear-button").click(onClearBoard);
   const path = window.location.pathname;
   const boardId = path.slice(path.lastIndexOf("/") + 1);
+
   const socket = io("?boardId=" + boardId);
   socket.on("drawLine", drawLine);
   socket.on("redraw", redraw);
   socket.on("clearBoard", () => {
     clearBoard();
-    styles.info("Someone cleared the board.", "Infomation");
+    toastr.info("Someone cleared the board.", "Infomation");
   });
   socket.emit("load", null, (data) => {
     console.log("load", data);
@@ -95,7 +115,7 @@ const ACTION = {
     if (status === "NOT_FOUND") {
       $.confirm({
         title: "NOT FOUND",
-        content: "Sorry Return to the top page.",
+        content: "Sorry. The board was not found. Return to the top page.",
         buttons: {
           ok: function () {
             window.location.href = "/";
@@ -105,8 +125,6 @@ const ACTION = {
     }
     for (let line of lineHist) {
       drawLine(line, false);
-    }
-    for (let key of Object.keys(noteList)) {
     }
   });
 
@@ -131,15 +149,15 @@ const ACTION = {
       context.canvas.clientHeight
     );
     $(".clone-note").remove();
-    resetHistory();
+    resetActionHistory();
   }
 
   function onUndo() {
     if (actionPointer < 0) {
-      styles.info("You can't undo anymore.", "Infomation");
+      toastr.info("You can't undo anymore.", "Infomation");
       return;
     }
-    const action = History[actionPointer];
+    const action = actionHistory[actionPointer];
     actionPointer -= 1;
     if (action.act === ACTION.drawLine) {
       socket.emit("hideLine", { id: action.id, hidden: true });
@@ -147,12 +165,12 @@ const ACTION = {
   }
 
   function onRedo() {
-    if (actionPointer === History.length - 1) {
-      styles.info("You can't redo anymore.", "Infomation");
+    if (actionPointer === actionHistory.length - 1) {
+      toastr.info("You can't redo anymore.", "Infomation");
       return;
     }
     actionPointer += 1;
-    const action = History[actionPointer];
+    const action = actionHistory[actionPointer];
     if (action.act === ACTION.drawLine) {
       socket.emit("hideLine", { id: action.id, hidden: false });
     }
@@ -215,15 +233,18 @@ const ACTION = {
   }
 
   function onMouseDown(e) {
+    $(".note").css("pointer-events", "none");
     saveCurrentPosition(e);
     if ([MODE.pen, MODE.line, MODE.box, MODE.circle].includes(current.mode)) {
       drawing = true;
-      current.id = randomUserID();
+      current.id = generateUniqueId();
     }
     setCursor();
+
   }
 
   function onMouseUp(e) {
+    $(".note").css("pointer-events", "auto");
     if (drawing) {
       drawing = false;
       drawLine(
@@ -242,7 +263,6 @@ const ACTION = {
       );
       putAction({ act: ACTION.drawLine, id: current.id });
     }
-
   }
 
   function onMouseMove(e) {
@@ -294,11 +314,8 @@ const ACTION = {
     setCursor();
   }
 
-
   function onClearBoard() {
     $.confirm({
-      theme: "supervan",
-      icon: "fas fa-trash",
       title: "CLEAR",
       content: "Clear the board. Are you okay?",
       buttons: {
@@ -311,7 +328,7 @@ const ACTION = {
       },
     });
   }
-  function curserControl(callback, delay) {
+  function throttle(callback, delay) {
     let previousCall = new Date().getTime();
     return function () {
       const time = new Date().getTime();
@@ -321,6 +338,17 @@ const ACTION = {
       }
     };
   }
+
+  let limitterTimer = null;
+  function limitter(callback, delay) {
+    if (!limitterTimer) {
+      limitterTimer = setTimeout(() => {
+        callback();
+        limitterTimer = null;
+      }, delay);
+    }
+  }
+
   function setCursor() {
     const mode = current.mode;
     let color = current.color;
@@ -356,26 +384,22 @@ const ACTION = {
       tweakY = 15;
       regular = true;
     }
-
     const canvas = document.createElement("canvas");
     canvas.width = size * 2;
     canvas.height = size * 2;
-
     const context = canvas.getContext("2d");
     const regularFont = regular ? "" : "900";
+    context.font = `${regularFont} ${size}px "Font Awesome 5 Free"`;
     context.fillStyle = color;
     context.fillText(unicode, canvas.width / 2, canvas.width / 2);
-
     $("#whiteboard").css(
       "cursor",
       `url(${canvas.toDataURL("image/png")}) ${tweakX} ${tweakY}, auto`
     );
   }
-
-  function randomUserID() {
-    const strong = 12345;
+  function generateUniqueId() {
+    const strong = 65535;
     return (
-      new Date().getTime().toString(16)
-    );
+      new Date().getTime().toString(16));
   }
 })();
