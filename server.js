@@ -20,7 +20,9 @@ if (REDIS_URL) {
   );
   redis = new Redis(REDIS_URL);
 }
+
 const boards = {};
+
 const saveLimitter = {};
 async function saveBoard(boardId) {
   if (!redis || saveLimitter[boardId]) return;
@@ -48,28 +50,22 @@ async function load() {
   }
 }
 load();
-
-// function for dynamic sorting
 function compareValues(key, order = "asc") {
   return function (a, b) {
     if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
-      // property doesn't exist on either object
       return 0;
     }
-
-    const varA = typeof a[key] === "string" ? a[key].toUpperCase() : a[key];
-    const varB = typeof b[key] === "string" ? b[key].toUpperCase() : b[key];
-
+    const A = typeof a[key] === "string" ? a[key].toUpperCase() : a[key];
+    const B = typeof b[key] === "string" ? b[key].toUpperCase() : b[key];
     let comparison = 0;
-    if (varA > varB) {
+    if (A > B) {
       comparison = 1;
-    } else if (varA < varB) {
+    } else if (A < B) {
       comparison = -1;
     }
     return order == "desc" ? comparison * -1 : comparison;
   };
 }
-
 function onConnection(socket) {
   const { boardId } = socket.handshake.query;
   let lineHist = [];
@@ -146,5 +142,4 @@ function onConnection(socket) {
   });
 }
 io.on("connection", onConnection);
-
 http.listen(PORT, () => console.log("listening on port " + PORT));
